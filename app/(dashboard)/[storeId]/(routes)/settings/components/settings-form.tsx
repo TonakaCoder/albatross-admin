@@ -23,6 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import AlertModal from "@/components/modals/alert-modal";
+import { ApiAlert } from "@/components/ui/api-alert";
+import { useOrigin } from "@/hooks/use-origin";
 
 interface SettingFormProps {
   initialData: Store;
@@ -37,6 +39,7 @@ type SettingsFormValues = z.infer<typeof formSchema>;
 export const SettingsForm: React.FC<SettingFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
+  const origin = useOrigin(); // to prevent hydration error
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -123,6 +126,12 @@ export const SettingsForm: React.FC<SettingFormProps> = ({ initialData }) => {
           </Button>
         </form>
       </Form>
+      <Separator />
+      <ApiAlert
+        title="NEXT_PUBLIC_API_URL"
+        description={`${origin}/api/${params.storeId}`}
+        variant="public"
+      />
     </>
   );
 };
