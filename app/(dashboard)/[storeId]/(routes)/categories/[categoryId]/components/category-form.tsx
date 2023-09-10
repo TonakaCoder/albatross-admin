@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Billboard } from "@prisma/client";
+import { Billboard, Category } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,21 +23,29 @@ import {
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import AlertModal from "@/components/modals/alert-modal";
-import ImageUpload from "@/components/ui/image-upload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-interface BillboardFormProps {
-  initialData: Billboard | null;
+type CategoryFormValues = z.infer<typeof formSchema>;
+
+interface CategoryFormProps {
+  initialData: Category | null;
+  billboards: Billboard[];
 }
 
 const formSchema = z.object({
-  label: z.string().min(1),
-  imageUrl: z.string().min(1),
+  name: z.string().min(1),
+  billboardId: z.string().min(1),
 });
 
-type BillboardsFormValues = z.infer<typeof formSchema>;
-
-export const BillboardForm: React.FC<BillboardFormProps> = ({
+export const CategoryForm: React.FC<CategoryFormProps> = ({
   initialData,
+  billboards,
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -46,34 +54,34 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
   const [loading, setLoading] = useState(false);
 
   const title = initialData ? "修正" : "新規作成";
-  const description = initialData ? "掲示板を修正" : "新しい掲示板の作成";
+  const description = initialData ? "カテゴリを修正" : "新しいカテゴリの作成";
   const toastMsg = initialData
-    ? "掲示板を修正しました。"
-    : "掲示板を作成しました。";
+    ? "カテゴリを修正しました。"
+    : "カテゴリ作成しました。";
   const action = initialData ? "変更を保存" : "作成";
 
-  const form = useForm<BillboardsFormValues>({
+  const form = useForm<CategoryFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      label: "",
-      imageUrl: "",
+      name: "",
+      billboardId: "",
     },
   });
 
-  const onSubmit = async (data: BillboardsFormValues) => {
+  const onSubmit = async (data: CategoryFormValues) => {
     try {
       setLoading(true);
       if (initialData) {
         await axios.patch(
-          `/api/${params.storeId}/billboards/${params.billboardId}`,
+          `/api/${params.storeId}/categories/${params.categoryId}`,
           data
         );
       } else {
-        await axios.post(`/api/${params.storeId}/billboards`, data);
+        await axios.post(`/api/${params.storeId}/categories`, data);
       }
 
       router.refresh();
-      router.push(`/${params.storeId}/billboards`);
+      router.push(`/${params.storeId}/categories`);
       toast.success(toastMsg);
     } catch (error: any) {
       toast.error("エラー");
@@ -86,13 +94,13 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
     try {
       setLoading(true);
       await axios.delete(
-        `/api/${params.storeId}/billboards/${params.billboardId}`
+        `/api/${params.storeId}/categories/${params.categoryId}`
       );
       router.refresh();
-      router.push(`/${params.storeId}/billboards`);
+      router.push(`/${params.storeId}/categories`);
       toast.success("削除されました。");
     } catch (error) {
-      toast.error("カテゴリの削除を確認してください。");
+      toast.error("商品の削除を確認してください。");
     } finally {
       setLoading(false);
       setOpen(false);
@@ -126,38 +134,52 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
           className="space-y-8 w-full"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>バックグラウンド画像</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value ? [field.value] : []}
-                    disabled={loading}
-                    onChange={(url) => field.onChange(url)}
-                    onRemove={() => field.onChange("")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
-              name="label"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ラベル</FormLabel>
+                  <FormLabel>カテゴリ名</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="掲示板名"
+                      placeholder="カテゴリ名"
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="billboardId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>掲示板</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder="掲示板を選択"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {billboards.map((billboard) => (
+                        <SelectItem key={billboard.id} value={billboard.id}>
+                          {billboard.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

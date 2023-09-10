@@ -9,13 +9,13 @@ import { Separator } from "@/components/ui/separator";
 import { DataTable } from "@/components/ui/data-table";
 import { ApiList } from "@/components/ui/api-list";
 
-import { BillboardColumn, columns } from "./columns";
+import { CategoryColumn, columns } from "./columns";
 
-interface BillboardClientProps {
-  data: BillboardColumn[];
+interface CategoryClientProps {
+  data: CategoryColumn[];
 }
 
-export const BillboardClient: React.FC<BillboardClientProps> = ({ data }) => {
+export const CategoryClient: React.FC<CategoryClientProps> = ({ data }) => {
   const router = useRouter();
   const params = useParams();
 
@@ -23,21 +23,21 @@ export const BillboardClient: React.FC<BillboardClientProps> = ({ data }) => {
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title={`Billboards (${data.length})`}
-          desciption="ストアの掲示板を管理"
+          title={`Categories (${data.length})`}
+          desciption="ストアのカテゴリを管理"
         />
         <Button
-          onClick={() => router.push(`/${params.storeId}/billboards/new`)}
+          onClick={() => router.push(`/${params.storeId}/categories/new`)}
         >
           <Plus className="mr-2 h-4 w-4" />
           追加
         </Button>
       </div>
       <Separator />
-      <DataTable columns={columns} data={data} searchKey="label" />
-      <Heading title="API" desciption="掲示板呼び出し" />
+      <DataTable columns={columns} data={data} searchKey="name" />
+      <Heading title="API" desciption="カテゴリ呼び出し" />
       <Separator />
-      <ApiList entityName="billboards" entityIdName="billboardId" />
+      <ApiList entityName="categories" entityIdName="categoryId" />
     </>
   );
 };
