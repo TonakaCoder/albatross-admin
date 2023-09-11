@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { BillboardColumn } from "./columns";
+import { ProductColumn } from "./columns";
 import { Button } from "@/components/ui/button";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -17,7 +17,7 @@ import axios from "axios";
 import AlertModal from "@/components/modals/alert-modal";
 
 interface CellActionProps {
-  data: BillboardColumn;
+  data: ProductColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data: { id } }) => {
@@ -35,7 +35,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data: { id } }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/billboards/${id}`);
+      await axios.delete(`/api/${params.storeId}/products/${id}`);
       router.refresh();
       toast.success("削除されました。");
     } catch (error) {
@@ -68,7 +68,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data: { id } }) => {
             コピー
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => router.push(`/${params.storeId}/billboards/${id}`)}
+            onClick={() => router.push(`/${params.storeId}/products/${id}`)}
           >
             <Edit className="mr-2 h-4 w-4" />
             更新
