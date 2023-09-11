@@ -30,7 +30,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
 
   return (
     <Modal
-      title="ストアが完全に削除されます。"
+      title="完全に削除されます。"
       description="この処理は取消できません。"
       isOpen={isOpen}
       onClose={onClose}

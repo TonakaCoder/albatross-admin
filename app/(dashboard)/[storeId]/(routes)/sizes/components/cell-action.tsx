@@ -7,7 +7,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CategoryColumn } from "./columns";
 import { Button } from "@/components/ui/button";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -15,9 +14,10 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
 import AlertModal from "@/components/modals/alert-modal";
+import { SizeColumn } from "./columns";
 
 interface CellActionProps {
-  data: CategoryColumn;
+  data: SizeColumn;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data: { id } }) => {
@@ -35,11 +35,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data: { id } }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/categories/${id}`);
+      await axios.delete(`/api/${params.storeId}/sizes/${id}`);
       router.refresh();
       toast.success("削除されました。");
     } catch (error) {
-      toast.error("先に商品の状態を確認してください。");
+      toast.error("先にこのサイズを使用している用品の削除を確認してください。");
     } finally {
       setLoading(false);
       setOpen(false);
@@ -68,7 +68,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data: { id } }) => {
             コピー
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => router.push(`/${params.storeId}/categories/${id}`)}
+            onClick={() => router.push(`/${params.storeId}/sizes/${id}`)}
           >
             <Edit className="mr-2 h-4 w-4" />
             更新
